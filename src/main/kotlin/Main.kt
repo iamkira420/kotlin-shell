@@ -1,5 +1,6 @@
 fun main() {
-    // Uncomment this block to pass the first stage
+    // list of currently defined commands
+    val builtInCommands = listOf("echo", "exit 0", "type")
 
     while (true) {
         print("$ ")
@@ -9,12 +10,20 @@ fun main() {
         } else {
             val text = input.split(" ", limit = 2)
             val command = text[0]
-            val commandArgs = if (text.size > 1) text[1] else ""
+            val commandArg = if (text.size > 1) text[1] else ""
 
             if (command == "echo") { // implement echo functionality
-                println(commandArgs)
+                println(commandArg)
             } else {
                 println("$input: command not found")
+            }
+
+            if (command == "type") {
+                if (builtInCommands.contains(commandArg)) {
+                    println("$commandArg is a shell builtin")
+                } else {
+                    println("$commandArg: not found")
+                }
             }
         }
     }
