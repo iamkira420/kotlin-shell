@@ -4,6 +4,11 @@ fun main() {
     while (true) {
         print("$ ")
         val command = readln() // Wait for user command
-        println("$command: command not found")
+        if (command == "exit 0") {
+               break
+        } else {
+            println("$command: command not found")
+        }
     }
 }
+
