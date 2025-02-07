@@ -9,7 +9,7 @@ fun main() {
         } else {
             val text = input.split(" ", limit = 2)
             val command = text[0]
-            val commandArgs = text[1]
+            val commandArgs = if (text.size > 1) text[1] else ""
 
             if (command == "echo") { // implement echo functionality
                 println(commandArgs)
