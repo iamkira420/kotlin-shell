@@ -3,11 +3,19 @@ fun main() {
 
     while (true) {
         print("$ ")
-        val command = readln() // Wait for user command
-        if (command == "exit 0") {
+        val input = readln() // Wait for user input command
+        if (input == "exit 0") {    // exit if user input command is <--
                break
         } else {
-            println("$command: command not found")
+            val text = input.split(" ", limit = 2)
+            val command = text[0]
+            val commandArgs = text[1]
+
+            if (command == "echo") { // implement echo functionality
+                println(commandArgs)
+            } else {
+                println("$input: command not found")
+            }
         }
     }
 }
