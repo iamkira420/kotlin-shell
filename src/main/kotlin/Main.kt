@@ -3,5 +3,5 @@ fun main() {
     print("$ ")
 
     val command = readln() // Wait for user command
-    println("invalid command: $command not found")
+    println("$command: command not found")
 }
