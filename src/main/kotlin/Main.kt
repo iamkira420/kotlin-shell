@@ -1,29 +1,24 @@
+import java.io.*
+import java.util.*
+
+// currently defined commands
 val builtInCommands = listOf("echo", "exit", "type")
 
 fun main() {
-    // list of currently defined commands
-
     while (true) {
         print("$ ")
         val input = readln() // Wait for user input command
 
-        if (input == "exit 0") {    // exit if user input command is <--
+        if (input == "exit 0") {
                break
         } else {
             val text = input.split(" ", limit = 2)
             val command = text[0]
             val commandArg = if (text.size > 1) text[1] else ""
 
-            // debugging: println("The $command command is a shell builtin and is defined: ${builtInCommands.contains(commandArg)}")
-
-            if (command == "echo") { // implement echo functionality
+            if (command == "echo") {
                 println(echo(commandArg))
             } else if (command == "type") {
-                /*if (builtInCommands.contains(commandArg)) {
-                    println("$commandArg is a shell builtin")
-                } else {
-                    println("$commandArg: not found")
-                }*/
                 println(type(commandArg))
             } else {
                 println("$command: not found")
@@ -32,8 +27,28 @@ fun main() {
     }
 }
 
+/**
+ * Look for the given command inside the directories listed in PATH
+ * Return the directory (Optional<String>) if found, otherwise Optional.notFound()
+ * @param command: command to search for in PATH directories
+ */
+fun getPath(command: String): Optional<String> {
+    val paths = System.getenv("PATH").split(":")
+    val foundPath = paths.firstOrNull() {
+        val file = File("$it/$command")
+        file.exists() && file.isFile()  // check if file exists AND is not a directory
+    }
+    return Optional.ofNullable(foundPath)
+}
+
 fun type(str: String): String {
-    return if ( builtInCommands.contains(str)) "$str is a shell builtin" else "$str: not found"
+    if ( builtInCommands.contains(str)) {
+        return "$str is a shell builtin"
+    } else if (getPath(str).isPresent && !builtInCommands.contains(str)) {
+        return "$str is ${getPath(str).get()}/$str"
+    } else {
+        return "$str: not found"
+    }
 }
 
 fun echo(str: String): String {
