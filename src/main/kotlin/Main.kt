@@ -20,6 +20,8 @@ fun main() {
                 println(echo(commandArg))
             } else if (command == "type") {
                 println(type(commandArg))
+            } else if (!builtInCommands.contains(command)) {
+                println(runExtProgram(command, commandArg))
             } else {
                 println("$command: not found")
             }
@@ -32,20 +34,44 @@ fun main() {
  * Return the directory (Optional<String>) if found, otherwise Optional.notFound()
  * @param command: command to search for in PATH directories
  */
-fun getPath(command: String): Optional<String> {
+fun getPath(command: String): String? {
     val paths = System.getenv("PATH").split(":")
-    val foundPath = paths.firstOrNull() {
-        val file = File("$it/$command")
-        file.exists() && file.isFile()  // check if file exists AND is not a directory
+    for (path in paths) {
+        val file = File(path, command)
+        if (file.exists() && file.isFile) {
+            return path
+        }
     }
-    return Optional.ofNullable(foundPath)
+    return "$command: not found"
 }
 
+/**
+ * Run the given external command, provided that it actually exists in the system
+ * @param command to be run
+ * @param arguments passed to the given command
+ * @return the commands output, otherwise a 'command not found' text
+ */
+fun runExtProgram(command: String, vararg arguments: String): String {
+    val cmdPath = getPath(command)
+
+    if (cmdPath != "$command: not found") {
+        val process = ProcessBuilder("$command", *arguments).redirectErrorStream(true).start()
+        return process.inputStream.bufferedReader().readText().trim()
+    } else {
+        return "$command: not found"
+    }
+}
+
+/**
+ * Given a command, look for its location using the PATH variable and return
+ * @param command name to look
+ * @return either the command file path or location, indicates whether the command is built-in, or a 'command_name not found' text
+ */
 fun type(str: String): String {
     if ( builtInCommands.contains(str)) {
         return "$str is a shell builtin"
-    } else if (getPath(str).isPresent && !builtInCommands.contains(str)) {
-        return "$str is ${getPath(str).get()}/$str"
+    } else if (getPath(str) != "$str: not found" && !builtInCommands.contains(str)) {
+        return "$str is ${getPath(str)}/$str"
     } else {
         return "$str: not found"
     }
