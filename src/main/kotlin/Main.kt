@@ -1,8 +1,9 @@
 import java.io.*
 import java.util.*
+import java.nio.file.Paths
 
 // currently defined commands
-val builtInCommands = listOf("echo", "exit", "type")
+val builtInCommands = listOf("echo", "exit", "type", "pwd")
 
 fun main() {
     while (true) {
@@ -22,6 +23,8 @@ fun main() {
                 println(type(commandArg))
             } else if (!builtInCommands.contains(command)) {
                 println(runExtProgram(command, commandArg))
+            } else if (command == "pwd") {
+                println(pwd())
             } else {
                 println("$command: not found")
             }
@@ -81,3 +84,10 @@ fun echo(str: String): String {
     return str
 }
 
+/**
+ * Return the current working directory
+ */
+fun pwd(): String {
+    val path = Paths.get("").toAbsolutePath().toString()
+    return path
+}
